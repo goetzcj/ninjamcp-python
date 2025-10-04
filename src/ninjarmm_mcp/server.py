@@ -6,7 +6,7 @@ import os
 from typing import Any, Sequence
 from dotenv import load_dotenv
 
-from mcp.server import Server
+from mcp.server import Server, NotificationOptions
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.types import (
@@ -284,10 +284,14 @@ class NinjaRMMServer:
                     write_stream,
                     InitializationOptions(
                         server_name="ninjarmm-mcp-server",
-                        server_version="1.3.0",
+                        server_version="1.3.1",
                         capabilities=self.server.get_capabilities(
-                            notification_options=None,
-                            experimental_capabilities=None,
+                            notification_options=NotificationOptions(
+                                prompts_changed=True,
+                                resources_changed=True,
+                                tools_changed=True,
+                            ),
+                            experimental_capabilities={},
                         ),
                     ),
                 )

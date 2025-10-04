@@ -96,7 +96,7 @@ class NinjaRMMClient:
         url = f"{self.api_base}/{endpoint.lstrip('/')}"
         headers = {
             "Authorization": f"Bearer {access_token}",
-            "User-Agent": "NinjaRMM-MCP-Server/1.3.0"
+            "User-Agent": "NinjaRMM-MCP-Server/1.3.1"
         }
         
         # Add content type for JSON requests
