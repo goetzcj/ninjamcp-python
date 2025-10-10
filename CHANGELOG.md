@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2025-10-10
+
+### Fixed
+- **CRITICAL**: Fixed "BaseModel.__init__() takes 1 positional argument but 3 were given" error
+  - Incorrect usage of `JSONRPCError` from MCP library causing tool execution failures
+  - Replaced improper positional arguments with correct keyword arguments
+  - All tools now properly handle errors and return expected error messages
+  - Affects all API operations when authentication or network errors occur
+
+### Technical Details
+- Updated `client.py` to use `NinjaRMMAPIError` instead of incorrectly constructed `JSONRPCError`
+- Updated `server.py` to use standard Python exceptions for tool execution errors
+- Removed incorrect imports of `INTERNAL_ERROR` and `METHOD_NOT_FOUND` constants
+- Proper error propagation now shows meaningful authentication and API error messages
+
 ## [1.4.0] - 2025-10-10
 
 ### Added

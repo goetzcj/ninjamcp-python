@@ -4,7 +4,7 @@ import json
 import logging
 from typing import Optional, Dict, Any, Union, List
 import httpx
-from mcp.types import JSONRPCError, INTERNAL_ERROR
+from mcp.types import ErrorData
 
 from .auth import AuthenticationManager
 
@@ -90,13 +90,13 @@ class NinjaRMMClient:
             access_token = await self.auth_manager.authenticate(operation)
         except Exception as e:
             logger.error(f"Authentication failed for {operation}: {e}")
-            raise JSONRPCError(INTERNAL_ERROR, f"Authentication failed: {e}")
+            raise NinjaRMMAPIError(f"Authentication failed: {e}", None, None)
         
         # Prepare request
         url = f"{self.api_base}/{endpoint.lstrip('/')}"
         headers = {
             "Authorization": f"Bearer {access_token}",
-            "User-Agent": "NinjaRMM-MCP-Server/1.4.0"
+            "User-Agent": "NinjaRMM-MCP-Server/1.4.1"
         }
         
         # Add content type for JSON requests
@@ -150,18 +150,18 @@ class NinjaRMMClient:
         except httpx.TimeoutException:
             error_msg = f"Request timeout for {operation}"
             logger.error(error_msg)
-            raise JSONRPCError(INTERNAL_ERROR, error_msg)
+            raise NinjaRMMAPIError(error_msg, None, None)
         except httpx.NetworkError as e:
             error_msg = f"Network error for {operation}: {e}"
             logger.error(error_msg)
-            raise JSONRPCError(INTERNAL_ERROR, error_msg)
+            raise NinjaRMMAPIError(error_msg, None, None)
         except NinjaRMMAPIError:
             # Re-raise API errors as-is
             raise
         except Exception as e:
             error_msg = f"Unexpected error for {operation}: {e}"
             logger.error(error_msg)
-            raise JSONRPCError(INTERNAL_ERROR, error_msg)
+            raise NinjaRMMAPIError(error_msg, None, None)
     
     async def get(self, endpoint: str, operation: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Make GET request."""

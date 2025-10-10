@@ -12,9 +12,7 @@ from mcp.server.stdio import stdio_server
 from mcp.types import (
     Tool,
     TextContent,
-    JSONRPCError,
-    INTERNAL_ERROR,
-    METHOD_NOT_FOUND,
+    ErrorData,
 )
 
 from .auth import AuthenticationManager
@@ -94,13 +92,13 @@ class NinjaRMMServer:
             
             handler = self.tool_registry.get_handler(name)
             if not handler:
-                raise JSONRPCError(METHOD_NOT_FOUND, f"Tool '{name}' not found")
+                raise ValueError(f"Tool '{name}' not found")
 
             try:
                 return await handler(arguments)
             except Exception as e:
                 logger.error(f"Error executing tool '{name}': {e}")
-                raise JSONRPCError(INTERNAL_ERROR, f"Tool execution failed: {e}")
+                raise RuntimeError(f"Tool execution failed: {e}")
     
     async def _register_tools(self) -> None:
         """Register all available tools."""
@@ -330,7 +328,7 @@ class NinjaRMMServer:
                     write_stream,
                     InitializationOptions(
                         server_name="ninjarmm-mcp-server",
-                        server_version="1.4.0",
+                        server_version="1.4.1",
                         capabilities=self.server.get_capabilities(
                             notification_options=NotificationOptions(
                                 prompts_changed=True,
