@@ -271,6 +271,52 @@ class NinjaRMMServer:
         except Exception as e:
             logger.error(f"Failed to initialize server: {e}")
             raise
+
+    async def inject_tokens(self, tokens_data: dict) -> None:
+        """
+        Inject tokens from external credential management system.
+
+        This method allows external credential management systems to provide
+        pre-obtained OAuth2 tokens instead of the server performing its own
+        authentication flow.
+
+        Args:
+            tokens_data: Dictionary containing token information:
+                {
+                    "client": {
+                        "access_token": "client_access_token_here",
+                        "refresh_token": "client_refresh_token_here",  # optional
+                        "expires_in": 3600,  # optional, defaults to 3600
+                        "scope": "monitoring management control"  # optional
+                    },
+                    "user": {
+                        "access_token": "user_access_token_here",
+                        "refresh_token": "user_refresh_token_here",  # optional
+                        "expires_in": 3600,  # optional, defaults to 3600
+                        "scope": "monitoring management control"  # optional
+                    }
+                }
+
+        Example:
+            server = NinjaRMMServer()
+            await server.initialize()
+
+            # Inject tokens from your credential management system
+            await server.inject_tokens({
+                "client": {
+                    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...",
+                    "refresh_token": "def50200...",
+                    "expires_in": 3600
+                },
+                "user": {
+                    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...",
+                    "refresh_token": "def50200...",
+                    "expires_in": 3600
+                }
+            })
+        """
+        await self.auth_manager.inject_tokens_from_dict(tokens_data)
+        logger.info("Tokens injected from external credential management system")
     
     async def run(self) -> None:
         """Run the MCP server."""
@@ -284,7 +330,7 @@ class NinjaRMMServer:
                     write_stream,
                     InitializationOptions(
                         server_name="ninjarmm-mcp-server",
-                        server_version="1.3.1",
+                        server_version="1.4.0",
                         capabilities=self.server.get_capabilities(
                             notification_options=NotificationOptions(
                                 prompts_changed=True,

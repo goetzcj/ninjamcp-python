@@ -44,8 +44,46 @@ class AuthenticationManager:
     async def initialize(self) -> None:
         """Initialize the authentication manager."""
         await self.token_manager.load_tokens()
+
+        # Check for injected tokens from credential management system
+        await self._check_injected_tokens()
+
         await self._update_auth_status()
     
+    async def _check_injected_tokens(self) -> None:
+        """Check for tokens injected by credential management system."""
+        import os
+
+        # Check for client credentials tokens
+        client_access_token = os.getenv("NINJARMM_CLIENT_ACCESS_TOKEN")
+        client_refresh_token = os.getenv("NINJARMM_CLIENT_REFRESH_TOKEN")
+        client_expires_in = os.getenv("NINJARMM_CLIENT_EXPIRES_IN")
+
+        if client_access_token:
+            expires_in = int(client_expires_in) if client_expires_in else 3600
+            await self.inject_client_token(
+                access_token=client_access_token,
+                refresh_token=client_refresh_token,
+                expires_in=expires_in,
+                scope=self.client_scopes
+            )
+            logger.info("Injected client credentials token from environment")
+
+        # Check for user authorization tokens
+        user_access_token = os.getenv("NINJARMM_USER_ACCESS_TOKEN")
+        user_refresh_token = os.getenv("NINJARMM_USER_REFRESH_TOKEN")
+        user_expires_in = os.getenv("NINJARMM_USER_EXPIRES_IN")
+
+        if user_access_token:
+            expires_in = int(user_expires_in) if user_expires_in else 3600
+            await self.inject_user_token(
+                access_token=user_access_token,
+                refresh_token=user_refresh_token,
+                expires_in=expires_in,
+                scope=self.user_scopes
+            )
+            logger.info("Injected user authorization token from environment")
+
     async def _update_auth_status(self) -> None:
         """Update authentication status with current tokens."""
         tokens = self.token_manager.get_all_tokens()
@@ -175,6 +213,85 @@ class AuthenticationManager:
         """Get current authentication status."""
         await self._update_auth_status()
         return self.auth_status
+
+    async def inject_client_token(self, access_token: str, refresh_token: Optional[str] = None,
+                                 expires_in: int = 3600, scope: Optional[str] = None) -> None:
+        """
+        Inject a client credentials token from external credential management system.
+
+        Args:
+            access_token: The access token
+            refresh_token: Optional refresh token
+            expires_in: Token expiration time in seconds
+            scope: Token scope
+        """
+        await self.token_manager.set_token(
+            token_type="client",
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=expires_in,
+            scope=scope or self.client_scopes
+        )
+        logger.info("Injected client credentials token")
+
+    async def inject_user_token(self, access_token: str, refresh_token: Optional[str] = None,
+                               expires_in: int = 3600, scope: Optional[str] = None) -> None:
+        """
+        Inject a user authorization token from external credential management system.
+
+        Args:
+            access_token: The access token
+            refresh_token: Optional refresh token
+            expires_in: Token expiration time in seconds
+            scope: Token scope
+        """
+        await self.token_manager.set_token(
+            token_type="user",
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=expires_in,
+            scope=scope or self.user_scopes
+        )
+        logger.info("Injected user authorization token")
+
+    async def inject_tokens_from_dict(self, tokens_data: Dict[str, Dict[str, Any]]) -> None:
+        """
+        Inject tokens from a dictionary (useful for credential management systems).
+
+        Args:
+            tokens_data: Dictionary with token data in format:
+                {
+                    "client": {
+                        "access_token": "...",
+                        "refresh_token": "...",
+                        "expires_in": 3600,
+                        "scope": "..."
+                    },
+                    "user": {
+                        "access_token": "...",
+                        "refresh_token": "...",
+                        "expires_in": 3600,
+                        "scope": "..."
+                    }
+                }
+        """
+        if "client" in tokens_data:
+            client_data = tokens_data["client"]
+            await self.inject_client_token(
+                access_token=client_data["access_token"],
+                refresh_token=client_data.get("refresh_token"),
+                expires_in=client_data.get("expires_in", 3600),
+                scope=client_data.get("scope")
+            )
+
+        if "user" in tokens_data:
+            user_data = tokens_data["user"]
+            await self.inject_user_token(
+                access_token=user_data["access_token"],
+                refresh_token=user_data.get("refresh_token"),
+                expires_in=user_data.get("expires_in", 3600),
+                scope=user_data.get("scope")
+            )
 
     async def reauthorize_user(self) -> None:
         """Force user re-authorization."""

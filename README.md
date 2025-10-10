@@ -6,6 +6,18 @@ A comprehensive Model Context Protocol (MCP) server for NinjaRMM API v2, providi
 
 **24 comprehensive tools** for complete NinjaRMM management across 8 categories:
 
+### 🔐 Credential Management System Integration
+
+The server supports integration with external credential management systems for enterprise environments:
+
+- **Environment variable injection**: Automatically detect tokens from environment variables
+- **Programmatic injection**: Inject tokens via API calls from your credential management system
+- **Centralized authentication**: No browser-based OAuth2 flows in production
+- **Token refresh support**: Automatic token refresh using provided refresh tokens
+- **Backward compatibility**: Falls back to standard OAuth2 flows if no tokens are injected
+
+See [Credential Management Integration Guide](docs/credential_management_integration.md) for detailed implementation.
+
 ### Device Management
 - **get_organizations**: List all organizations with IDs and names
 - **get_devices**: Get basic device information with **advanced filtering capabilities**

@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-10-10
+
+### Added
+- **Credential Management System Integration**: Enterprise-grade token injection capability
+  - Environment variable injection: Automatically detect tokens from `NINJARMM_*_ACCESS_TOKEN` environment variables
+  - Programmatic injection: `inject_tokens()` method for external credential management systems
+  - Server-level injection: Direct token injection via `NinjaRMMServer.inject_tokens()`
+  - Backward compatibility: Falls back to standard OAuth2 flows if no tokens are injected
+  - Token refresh support: Automatic refresh using injected refresh tokens
+
+### Enhanced
+- **Authentication Manager**: New methods for token injection and credential management integration
+  - `inject_client_token()`: Inject client credentials tokens
+  - `inject_user_token()`: Inject user authorization tokens
+  - `inject_tokens_from_dict()`: Bulk token injection from dictionary
+- **Documentation**: Comprehensive credential management integration guide and examples
+- **Examples**: Complete example script demonstrating integration patterns
+
+### Use Cases
+- **Enterprise Environments**: Centralized credential management without browser-based OAuth2
+- **Production Deployments**: Pre-authenticated tokens from secure credential stores
+- **CI/CD Pipelines**: Automated authentication using stored credentials
+- **Multi-tenant Systems**: Isolated credential management per tenant
+
 ## [1.3.1] - 2025-10-04
 
 ### Fixed
