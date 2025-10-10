@@ -44,7 +44,7 @@ class NinjaRMMServer:
         load_dotenv()
         
         # Configuration from environment
-        self.base_url = os.getenv("NINJARMM_BASE_URL", "https://app.ninjarmm.com")
+        self.base_url = self._normalize_base_url(os.getenv("NINJARMM_BASE_URL", "https://app.ninjarmm.com"))
         self.client_id = os.getenv("NINJARMM_CLIENT_ID")
         self.client_secret = os.getenv("NINJARMM_CLIENT_SECRET")
         self.auth_mode = os.getenv("NINJARMM_AUTH_MODE", "hybrid")
@@ -75,7 +75,21 @@ class NinjaRMMServer:
         
         # Register handlers
         self._register_handlers()
-    
+
+    def _normalize_base_url(self, base_url: str) -> str:
+        """Normalize base URL to ensure it has proper protocol."""
+        if not base_url or not base_url.strip():
+            return "https://app.ninjarmm.com"
+
+        base_url = base_url.strip()
+
+        # If URL already has protocol (case-insensitive), return as-is
+        if base_url.lower().startswith(("http://", "https://")):
+            return base_url
+
+        # Add https:// protocol if missing
+        return f"https://{base_url}"
+
     def _register_handlers(self) -> None:
         """Register MCP server handlers."""
         
@@ -328,7 +342,7 @@ class NinjaRMMServer:
                     write_stream,
                     InitializationOptions(
                         server_name="ninjarmm-mcp-server",
-                        server_version="1.4.1",
+                        server_version="1.4.2",
                         capabilities=self.server.get_capabilities(
                             notification_options=NotificationOptions(
                                 prompts_changed=True,

@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 2025-10-10
+
+### Fixed
+- **URL Protocol Validation**: Fixed "Request URL is missing an 'http://' or 'https://' protocol" error
+  - Added automatic protocol normalization for `NINJARMM_BASE_URL` environment variable
+  - Empty or whitespace-only URLs default to `https://app.ninjarmm.com`
+  - URLs without protocol automatically get `https://` prefix
+  - Case-insensitive protocol detection preserves original URL format
+  - Handles edge cases: localhost, IP addresses, URLs with paths
+
+### Technical Details
+- Added `_normalize_base_url()` method to `NinjaRMMServer` class
+- Validates and normalizes base URL during server initialization
+- Prevents HTTP client errors when users set invalid base URLs
+- Maintains backward compatibility with properly formatted URLs
+
 ## [1.4.1] - 2025-10-10
 
 ### Fixed
