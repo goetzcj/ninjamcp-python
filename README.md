@@ -4,7 +4,7 @@ A comprehensive Model Context Protocol (MCP) server for NinjaRMM API v2, providi
 
 ## Features
 
-**24 comprehensive tools** for complete NinjaRMM management across 8 categories:
+**26 comprehensive tools** for complete NinjaRMM management across 8 categories:
 
 ### 🔐 Credential Management System Integration
 
@@ -72,11 +72,13 @@ get_device_count(online_status="online")  # Efficient filtered counting
 
 ### Alert Management
 - **get_alerts**: Retrieve alerts with optional filtering by device or organization
+- **get_device_alerts**: Retrieve active alerts (triggered conditions) for a specific device
 - **reset_alert**: Reset/acknowledge specific alerts
 
 ### Backup & Automation
 - **get_backup_jobs**: Retrieve backup job information
 - **get_automation_scripts**: Get available automation scripts
+- **get_device_scripting_options**: Get available built-in actions and custom scripts for a specific device
 - **run_script**: Execute automation scripts on devices
 
 ### Comprehensive Ticketing System

@@ -342,7 +342,7 @@ class NinjaRMMServer:
                     write_stream,
                     InitializationOptions(
                         server_name="ninjarmm-mcp-server",
-                        server_version="1.4.2",
+                        server_version="1.4.3",
                         capabilities=self.server.get_capabilities(
                             notification_options=NotificationOptions(
                                 prompts_changed=True,
