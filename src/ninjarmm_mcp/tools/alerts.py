@@ -177,13 +177,72 @@ class ResetAlertTool(BaseTool):
             )]
 
 
+class GetDeviceAlertsTool(BaseTool):
+    """Tool to get alerts for a specific device."""
+
+    @property
+    def name(self) -> str:
+        return "get_device_alerts"
+
+    @property
+    def description(self) -> str:
+        return "Retrieve active alerts (triggered conditions) for a specific device"
+
+    @property
+    def input_schema(self) -> Dict[str, Any]:
+        return {
+            "type": "object",
+            "properties": {
+                "device_id": {
+                    "type": "integer",
+                    "description": "Device identifier"
+                },
+                "lang": {
+                    "type": "string",
+                    "description": "Language tag (optional)"
+                },
+                "tz": {
+                    "type": "string",
+                    "description": "Time Zone (optional)"
+                }
+            },
+            "required": ["device_id"]
+        }
+
+    async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
+        """Execute get device alerts."""
+        try:
+            device_id = arguments["device_id"]
+
+            # Build query parameters
+            params = {}
+            if arguments.get("lang"):
+                params["lang"] = arguments["lang"]
+            if arguments.get("tz"):
+                params["tz"] = arguments["tz"]
+
+            result = await self.client.get(f"/device/{device_id}/alerts", "get_device_alerts", params=params)
+
+            return [TextContent(
+                type="text",
+                text=self.client._safe_json_stringify(result)
+            )]
+
+        except Exception as e:
+            return [TextContent(
+                type="text",
+                text=f"Error getting device alerts: {str(e)}"
+            )]
+
+
 class AlertTools:
     """Collection of alert management tools."""
-    
+
     @staticmethod
     def get_tools(client) -> List[BaseTool]:
         """Get all alert management tools."""
         return [
             GetAlertsTool(client),
-            ResetAlertTool(client)
+            ResetAlertTool(client),
+            GetDeviceAlertsTool(client)
         ]

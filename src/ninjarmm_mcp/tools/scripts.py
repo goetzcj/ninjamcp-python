@@ -165,13 +165,66 @@ class RunScriptTool(BaseTool):
             )]
 
 
+class GetDeviceScriptingOptionsTool(BaseTool):
+    """Tool to get available scripting options (built-in actions, custom scripts) for a specific device."""
+
+    @property
+    def name(self) -> str:
+        return "get_device_scripting_options"
+
+    @property
+    def description(self) -> str:
+        return "Retrieve available scripting options (built-in actions, custom scripts) for a specific device"
+
+    @property
+    def input_schema(self) -> Dict[str, Any]:
+        return {
+            "type": "object",
+            "properties": {
+                "device_id": {
+                    "type": "integer",
+                    "description": "Device identifier"
+                },
+                "lang": {
+                    "type": "string",
+                    "description": "Language tag (optional)"
+                }
+            },
+            "required": ["device_id"]
+        }
+
+    async def execute(self, arguments: Dict[str, Any]) -> List[TextContent]:
+        """Execute get device scripting options."""
+        try:
+            device_id = arguments["device_id"]
+
+            # Build query parameters
+            params = {}
+            if arguments.get("lang"):
+                params["lang"] = arguments["lang"]
+
+            result = await self.client.get(f"/device/{device_id}/scripting/options", "get_device_scripting_options", params=params)
+
+            return [TextContent(
+                type="text",
+                text=self.client._safe_json_stringify(result)
+            )]
+
+        except Exception as e:
+            return [TextContent(
+                type="text",
+                text=f"Error getting device scripting options: {str(e)}"
+            )]
+
+
 class ScriptTools:
     """Collection of script execution tools."""
-    
+
     @staticmethod
     def get_tools(client) -> List[BaseTool]:
         """Get all script execution tools."""
         return [
             GetAutomationScriptsTool(client),
-            RunScriptTool(client)
+            RunScriptTool(client),
+            GetDeviceScriptingOptionsTool(client)
         ]
