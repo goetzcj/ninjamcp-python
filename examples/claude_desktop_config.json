@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "ninjarmm": {
+      "command": "ninjamcp-python",
+      "env": {
+        "NINJARMM_CLIENT_ID": "your_client_id_here",
+        "NINJARMM_CLIENT_SECRET": "your_client_secret_here",
+        "NINJARMM_BASE_URL": "https://app.ninjarmm.com",
+        "NINJARMM_AUTH_MODE": "hybrid",
+        "NINJARMM_CLIENT_SCOPES": "monitoring management control",
+        "NINJARMM_USER_SCOPES": "monitoring management control"
+      }
+    }
+  }
+}

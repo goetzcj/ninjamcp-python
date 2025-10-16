@@ -9,7 +9,7 @@ A comprehensive MCP server for NinjaRMM API v2 with support for:
 - OAuth2 authentication with client credentials and user flows
 """
 
-__version__ = "1.3.0"
+__version__ = "1.4.4"
 __author__ = "Chris Goetz"
 __email__ = "goetzcj@gmail.com"
 

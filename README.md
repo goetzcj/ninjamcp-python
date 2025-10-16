@@ -128,7 +128,11 @@ NINJARMM_TOKEN_STORAGE_PATH=./tokens.json
 ### As a Standalone Server
 
 ```bash
+# Using console script
 ninjamcp-python
+
+# Using module execution
+python -m ninjarmm_mcp
 ```
 
 ### As a Python Package
@@ -139,6 +143,10 @@ from ninjarmm_mcp import NinjaRMMServer
 server = NinjaRMMServer()
 await server.run()
 ```
+
+### Claude Desktop Integration
+
+For Claude Desktop integration, see the [Claude Desktop Setup Guide](docs/claude_desktop_setup.md) for detailed configuration instructions.
 
 ## Requirements
 

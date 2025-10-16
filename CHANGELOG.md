@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.4] - 2025-10-16
+
+### Added
+- **Module Execution Support**: Added `__main__.py` for `python -m ninjarmm_mcp` execution
+  - Enables CrewAI integration and direct module execution
+  - Provides proper async/sync handling for module entry point
+  - Includes graceful shutdown on KeyboardInterrupt
+
+### Fixed
+- **Console Script Entry Point**: Fixed console script to use synchronous wrapper
+  - Changed from `ninjarmm_mcp.server:main` to `ninjarmm_mcp.server:main_sync`
+  - Resolves issues with async function calls from console scripts
+  - Ensures proper error handling and exit codes
+
+### Documentation
+- **Claude Desktop Integration Guide**: Added comprehensive setup documentation
+  - Step-by-step configuration instructions for Claude Desktop
+  - Environment variable configuration examples
+  - Troubleshooting guide for common issues
+  - Security best practices and advanced configuration options
+
+### Technical Details
+- Both `python -m ninjarmm_mcp` and `ninjamcp-python` console script now work properly
+- Full MCP specification compliance maintained
+- Improved error handling and user feedback for startup issues
+- Enhanced packaging for better integration with AI frameworks
+
 ## [1.4.3] - 2025-10-14
 
 ### Added

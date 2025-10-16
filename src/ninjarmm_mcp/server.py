@@ -342,7 +342,7 @@ class NinjaRMMServer:
                     write_stream,
                     InitializationOptions(
                         server_name="ninjarmm-mcp-server",
-                        server_version="1.4.3",
+                        server_version="1.4.4",
                         capabilities=self.server.get_capabilities(
                             notification_options=NotificationOptions(
                                 prompts_changed=True,
@@ -364,5 +364,22 @@ async def main() -> None:
     await server.run()
 
 
+def main_sync() -> None:
+    """
+    Synchronous entry point for console scripts.
+
+    This function is used by the console script entry point in pyproject.toml
+    and provides a synchronous interface to the async main function.
+    """
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\nServer stopped by user", file=sys.stderr)
+        sys.exit(0)
+    except Exception as e:
+        print(f"Server error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main_sync()
