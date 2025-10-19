@@ -52,11 +52,17 @@ class NinjaRMMServer:
         self.user_scopes = os.getenv("NINJARMM_USER_SCOPES", "monitoring management control")
         self.user_redirect_port = int(os.getenv("NINJARMM_USER_REDIRECT_PORT", "8090"))
         self.token_storage_path = os.getenv("NINJARMM_TOKEN_STORAGE_PATH", "./tokens.json")
-        
-        # Validate required configuration
-        if not self.client_id or not self.client_secret:
-            raise ValueError("NINJARMM_CLIENT_ID and NINJARMM_CLIENT_SECRET must be set")
-        
+
+        # Determine if we have machine-to-machine credentials
+        self.has_machine_credentials = bool(self.client_id and self.client_secret)
+
+        # If no machine credentials, default to user-only mode for injected credentials
+        if not self.has_machine_credentials:
+            self.auth_mode = "user"
+            # Use placeholder values for initialization - will be overridden by injected credentials
+            self.client_id = "placeholder"
+            self.client_secret = "placeholder"
+
         # Initialize components
         self.auth_manager = AuthenticationManager(
             base_url=self.base_url,
@@ -66,7 +72,8 @@ class NinjaRMMServer:
             client_scopes=self.client_scopes,
             user_scopes=self.user_scopes,
             user_redirect_port=self.user_redirect_port,
-            token_storage_path=self.token_storage_path
+            token_storage_path=self.token_storage_path,
+            has_machine_credentials=self.has_machine_credentials
         )
         
         self.client = NinjaRMMClient(self.auth_manager)
@@ -342,7 +349,7 @@ class NinjaRMMServer:
                     write_stream,
                     InitializationOptions(
                         server_name="ninjarmm-mcp-server",
-                        server_version="1.4.4",
+                        server_version="1.4.5",
                         capabilities=self.server.get_capabilities(
                             notification_options=NotificationOptions(
                                 prompts_changed=True,

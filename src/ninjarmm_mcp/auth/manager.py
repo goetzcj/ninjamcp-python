@@ -21,7 +21,8 @@ class AuthenticationManager:
         client_scopes: str = "monitoring management control",
         user_scopes: str = "monitoring management control",
         user_redirect_port: int = 8090,
-        token_storage_path: str = "./tokens.json"
+        token_storage_path: str = "./tokens.json",
+        has_machine_credentials: bool = True
     ):
         self.base_url = base_url
         self.client_id = client_id
@@ -29,10 +30,15 @@ class AuthenticationManager:
         self.auth_mode = auth_mode
         self.client_scopes = client_scopes
         self.user_scopes = user_scopes
-        
+        self.has_machine_credentials = has_machine_credentials
+
         # Initialize components
         self.token_manager = TokenManager(token_storage_path)
-        self.oauth_client = OAuth2Client(base_url, client_id, client_secret, user_redirect_port)
+        # Only initialize OAuth client if we have real credentials
+        if has_machine_credentials:
+            self.oauth_client = OAuth2Client(base_url, client_id, client_secret, user_redirect_port)
+        else:
+            self.oauth_client = None
         
         # Initialize auth status
         self.auth_status = AuthStatus(
@@ -123,14 +129,20 @@ class AuthenticationManager:
                 logger.warning(f"Failed to refresh user token: {e}")
         
         # Determine which authentication flow to use
-        if self.auth_mode == "client" or (
-            self.auth_mode == "hybrid" and 
+        if not self.has_machine_credentials:
+            # No machine credentials available - must use injected user tokens
+            if not self.auth_status.tokens["user"].is_valid():
+                raise Exception("No valid authentication available. Machine credentials not configured and no user tokens injected.")
+            # Skip authentication flow since we rely on injected tokens
+            return self.auth_status.tokens["user"].access_token
+        elif self.auth_mode == "client" or (
+            self.auth_mode == "hybrid" and
             operation and "ticket" not in operation.lower()
         ):
             # Use client credentials for non-ticket operations
             await self._authenticate_client_credentials()
         elif self.auth_mode == "user" or (
-            self.auth_mode == "hybrid" and 
+            self.auth_mode == "hybrid" and
             operation and "ticket" in operation.lower()
         ):
             # Use user authorization for ticket operations
@@ -148,6 +160,9 @@ class AuthenticationManager:
 
     async def _authenticate_client_credentials(self) -> None:
         """Authenticate using client credentials flow."""
+        if not self.has_machine_credentials or not self.oauth_client:
+            raise Exception("Client credentials authentication not available - no machine credentials configured")
+
         try:
             logger.info("Authenticating with client credentials")
             token_data = await self.oauth_client.get_client_credentials_token(self.client_scopes)
@@ -167,6 +182,9 @@ class AuthenticationManager:
 
     async def _authenticate_user_authorization(self) -> None:
         """Authenticate using user authorization flow."""
+        if not self.has_machine_credentials or not self.oauth_client:
+            raise Exception("User authorization flow not available - no machine credentials configured for OAuth flow")
+
         try:
             logger.info("Starting user authorization flow")
             token_data = await self.oauth_client.get_user_authorization_token(self.user_scopes)
@@ -187,6 +205,9 @@ class AuthenticationManager:
 
     async def _refresh_user_token(self) -> None:
         """Refresh user token using refresh token."""
+        if not self.has_machine_credentials or not self.oauth_client:
+            raise Exception("Token refresh not available - no machine credentials configured for OAuth flow")
+
         user_token = self.token_manager.get_token("user")
         if not user_token.refresh_token:
             raise Exception("No refresh token available")

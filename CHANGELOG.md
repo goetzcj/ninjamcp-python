@@ -32,6 +32,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved error handling and user feedback for startup issues
 - Enhanced packaging for better integration with AI frameworks
 
+## [1.4.5] - 2025-10-14
+
+### Added
+- **Optional Environment Variables**: Server can now start without any environment variables
+  - No longer requires `NINJARMM_CLIENT_ID` and `NINJARMM_CLIENT_SECRET` at startup
+  - Automatically detects when machine-to-machine credentials are not available
+  - Defaults to user-only authentication mode when no machine credentials provided
+  - Perfect for enterprise credential management systems and dynamic token provisioning
+
+- **Enhanced Data-Driven Authentication**: Fully supports runtime credential injection
+  - Server can operate entirely on injected user tokens
+  - No dependency on environment variables for credential management
+  - Maintains backward compatibility with existing environment variable configurations
+
+### Technical Details
+- Modified `NinjaRMMServer.__init__()` to make environment variables optional
+- Added `has_machine_credentials` flag to track credential availability
+- Updated `AuthenticationManager` to handle missing OAuth client gracefully
+- Enhanced authentication logic to prioritize injected tokens when machine credentials unavailable
+- OAuth client initialization is now conditional based on credential availability
+
 ## [1.4.3] - 2025-10-14
 
 ### Added

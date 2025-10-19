@@ -110,6 +110,10 @@ pip install ninjamcp-python
 
 ## Configuration
 
+The server supports two configuration modes:
+
+### 1. Environment Variables (Traditional)
+
 Create a `.env` file with your NinjaRMM credentials:
 
 ```env
@@ -122,6 +126,34 @@ NINJARMM_USER_SCOPES=monitoring management control
 NINJARMM_USER_REDIRECT_PORT=8090
 NINJARMM_TOKEN_STORAGE_PATH=./tokens.json
 ```
+
+### 2. Runtime Credential Injection (Data-Driven)
+
+**NEW**: The server can now start without any environment variables and work entirely with injected credentials:
+
+```python
+from ninjarmm_mcp.server import NinjaRMMServer
+
+# Start server without environment variables
+server = NinjaRMMServer()
+await server.initialize()
+
+# Inject credentials at runtime
+await server.inject_tokens({
+    "user": {
+        "access_token": "your_user_access_token",
+        "refresh_token": "your_refresh_token",
+        "expires_in": 3600,
+        "scope": "monitoring management control"
+    }
+})
+```
+
+This mode is perfect for:
+- **Enterprise credential management systems**
+- **Dynamic token provisioning**
+- **Containerized deployments**
+- **Multi-tenant environments**
 
 ## Usage
 
